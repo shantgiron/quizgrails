@@ -1,27 +1,35 @@
-package quizgrails
+package quizdegrails
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
 class UsuarioController {
 
     UsuarioService usuarioService
-
+    EventoService eventoService
+    UsuarioEventoService usuarioEventoService
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    @Secured('ROLE_ADMIN')
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond usuarioService.list(params), model:[usuarioCount: usuarioService.count()]
     }
 
+    @Secured('ROLE_ADMIN')
     def show(Long id) {
         respond usuarioService.get(id)
     }
 
+    @Secured('ROLE_ADMIN')
     def create() {
-        respond new Usuario(params)
+        def map = ['eventos': Evento.findAll()]
+        respond  map
+
     }
 
+    @Secured('ROLE_ADMIN')
     def save(Usuario usuario) {
         if (usuario == null) {
             notFound()
@@ -35,6 +43,20 @@ class UsuarioController {
             return
         }
 
+        def lista = params.evento.toList()
+
+        for (String x: lista){
+
+            println(x)
+            def evento = Evento.findById(Long.parseLong(x))
+            println(evento: evento)
+            println(usuario: usuario)
+            UsuarioEvento usuarioEvento = new UsuarioEvento(user: usuario, evento: evento).save(failOnError: true)
+            println(usuarioEvento)
+        }
+
+
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuario.id])
@@ -44,10 +66,12 @@ class UsuarioController {
         }
     }
 
+    @Secured('ROLE_ADMIN')
     def edit(Long id) {
         respond usuarioService.get(id)
     }
 
+    @Secured('ROLE_ADMIN')
     def update(Usuario usuario) {
         if (usuario == null) {
             notFound()
@@ -70,6 +94,7 @@ class UsuarioController {
         }
     }
 
+    @Secured('ROLE_ADMIN')
     def delete(Long id) {
         if (id == null) {
             notFound()
