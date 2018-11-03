@@ -1,5 +1,6 @@
 package quizgrails
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -9,19 +10,23 @@ class EventoController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    @Secured('ROLE_ADMIN')
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond eventoService.list(params), model:[eventoCount: eventoService.count()]
     }
 
+    @Secured('ROLE_ADMIN')
     def show(Long id) {
         respond eventoService.get(id)
     }
 
+    @Secured('ROLE_ADMIN')
     def create() {
         respond new Evento(params)
     }
 
+    @Secured('ROLE_ADMIN')
     def save(Evento evento) {
         if (evento == null) {
             notFound()
@@ -44,10 +49,12 @@ class EventoController {
         }
     }
 
+    @Secured('ROLE_ADMIN')
     def edit(Long id) {
         respond eventoService.get(id)
     }
 
+    @Secured('ROLE_ADMIN')
     def update(Evento evento) {
         if (evento == null) {
             notFound()
@@ -70,6 +77,7 @@ class EventoController {
         }
     }
 
+    @Secured('ROLE_ADMIN')
     def delete(Long id) {
         if (id == null) {
             notFound()
