@@ -1,4 +1,4 @@
-package quizdegrails
+package quizgrails
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
